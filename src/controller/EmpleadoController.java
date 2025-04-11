@@ -3,6 +3,7 @@ package controller;
 import db.DatabaseConnection;
 import util.QRScanner;
 import view.EmpleadoView;
+import view.LoginView;
 
 import java.sql.*;
 
@@ -16,6 +17,7 @@ public class EmpleadoController {
 
     private void initController() {
         view.addScanListener(e -> escanearYRegistrar());
+        view.addCerrarSesionListener(e -> cerrarSesion());
     }
 
     private void escanearYRegistrar() {
@@ -80,5 +82,14 @@ public class EmpleadoController {
             ex.printStackTrace();
         }
     }
+
+    private void cerrarSesion() {
+        view.dispose(); // Cierra la ventana del empleado
+        LoginView loginView = new LoginView();
+        new LoginController(loginView);
+        loginView.setVisible(true);
+    }
+
+
 }
 

@@ -6,36 +6,51 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import db.DatabaseConnection;
+import java.text.SimpleDateFormat;
 
 public class EmpleadoView extends JFrame {
     private int idEmpleado;
     private JButton btnScan;
+    private JButton btnCerrarSesion;
     private JTable tablaHistorial;
     private DefaultTableModel tableModel;
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm"); // Formato solo hora:minuto
 
     public EmpleadoView(int idEmpleado) {
         this.idEmpleado = idEmpleado;
         setTitle("CheckAsist - Empleado");
-        setSize(600, 400);
+        setSize(700, 450);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new BorderLayout());
-        btnScan = new JButton("Escanear QR");
-        panel.add(btnScan, BorderLayout.NORTH);
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
 
+        // Panel superior con botones
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        btnScan = new JButton("📷 Escanear QR");
+        btnCerrarSesion = new JButton("⏏ Cerrar sesión");
+        panelBotones.add(btnScan);
+        panelBotones.add(btnCerrarSesion);
+
+        panelPrincipal.add(panelBotones, BorderLayout.NORTH);
+
+        // Tabla historial
         String[] columnas = {"Fecha", "Entrada", "Salida", "Duración", "Justificado"};
         tableModel = new DefaultTableModel(columnas, 0);
         tablaHistorial = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tablaHistorial);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
 
-        add(panel);
+        add(panelPrincipal);
         cargarHistorial();
     }
 
     public void addScanListener(ActionListener listener) {
         btnScan.addActionListener(listener);
+    }
+
+    public void addCerrarSesionListener(ActionListener listener) {
+        btnCerrarSesion.addActionListener(listener);
     }
 
     public void cargarHistorial() {
@@ -49,9 +64,12 @@ public class EmpleadoView extends JFrame {
 
             while (rs.next()) {
                 String fecha = rs.getDate("fecha").toString();
-                String entrada = rs.getTimestamp("hora_entrada") != null ? rs.getTimestamp("hora_entrada").toString() : "-";
-                String salida = rs.getTimestamp("hora_salida") != null ? rs.getTimestamp("hora_salida").toString() : "-";
-                String duracion = calcularDuracion(rs.getTimestamp("hora_entrada"), rs.getTimestamp("hora_salida"));
+                Timestamp entradaTs = rs.getTimestamp("hora_entrada");
+                Timestamp salidaTs = rs.getTimestamp("hora_salida");
+
+                String entrada = entradaTs != null ? timeFormat.format(entradaTs) : "-";
+                String salida = salidaTs != null ? timeFormat.format(salidaTs) : "-";
+                String duracion = calcularDuracion(entradaTs, salidaTs);
                 String justificado = rs.getBoolean("justificado") ? "Sí" : "No";
 
                 tableModel.addRow(new Object[]{fecha, entrada, salida, duracion, justificado});
@@ -62,14 +80,27 @@ public class EmpleadoView extends JFrame {
     }
 
     private String calcularDuracion(Timestamp entrada, Timestamp salida) {
-        if (entrada == null || salida == null) return "-";
+        if (entrada == null || salida == null) {
+            return "-"; // Si falta entrada o salida, no hay duración
+        }
         long diff = salida.getTime() - entrada.getTime();
+        if (diff < 0) {
+            return "Error: Salida antes de entrada"; // Evitar duraciones negativas
+        }
         long horas = diff / (1000 * 60 * 60);
         long minutos = (diff % (1000 * 60 * 60)) / (1000 * 60);
-        return horas + "h " + minutos + "m";
+        return String.format("%dh %dm", horas, minutos); // Formato consistente
     }
 
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
+    }
+
+    // Método main para pruebas
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            EmpleadoView view = new EmpleadoView(1); // Prueba con idEmpleado = 1
+            view.setVisible(true);
+        });
     }
 }

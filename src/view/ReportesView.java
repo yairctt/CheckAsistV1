@@ -3,10 +3,11 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import com.toedter.calendar.JDateChooser;  // Importar JCalendar
 
 public class ReportesView extends JFrame {
     private JComboBox<String> comboEmpleados;
-    private JTextField txtFechaInicio, txtFechaFin;
+    private JDateChooser dateInicio, dateFin;  // JDateChooser para fechas
     private JButton btnGenerarCSV, btnGenerarPDF, btnVolver;
 
     public ReportesView() {
@@ -23,13 +24,15 @@ public class ReportesView extends JFrame {
         comboEmpleados.addItem("Todos");
         panel.add(comboEmpleados);
 
-        panel.add(new JLabel("Fecha Inicio (YYYY-MM-DD):"));
-        txtFechaInicio = new JTextField();
-        panel.add(txtFechaInicio);
+        panel.add(new JLabel("Fecha Inicio:"));
+        dateInicio = new JDateChooser();
+        dateInicio.setDateFormatString("yyyy-MM-dd");
+        panel.add(dateInicio);
 
-        panel.add(new JLabel("Fecha Fin (YYYY-MM-DD):"));
-        txtFechaFin = new JTextField();
-        panel.add(txtFechaFin);
+        panel.add(new JLabel("Fecha Fin:"));
+        dateFin = new JDateChooser();
+        dateFin.setDateFormatString("yyyy-MM-dd");
+        panel.add(dateFin);
 
         btnGenerarCSV = new JButton("Generar CSV");
         btnGenerarPDF = new JButton("Generar PDF");
@@ -62,9 +65,23 @@ public class ReportesView extends JFrame {
         }
     }
 
-    public String getFechaInicio() { return txtFechaInicio.getText(); }
-    public String getFechaFin() { return txtFechaFin.getText(); }
-    public String getSelectedEmpleado() { return (String) comboEmpleados.getSelectedItem(); }
+    public String getFechaInicio() {
+        if (dateInicio.getDate() != null) {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd").format(dateInicio.getDate());
+        }
+        return null;
+    }
+
+    public String getFechaFin() {
+        if (dateFin.getDate() != null) {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd").format(dateFin.getDate());
+        }
+        return null;
+    }
+
+    public String getSelectedEmpleado() {
+        return (String) comboEmpleados.getSelectedItem();
+    }
 
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);

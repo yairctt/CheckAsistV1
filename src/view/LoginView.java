@@ -9,6 +9,7 @@ public class LoginView extends JFrame {
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnLogin;
+    private JButton btnEscaneoRapido; // Nuevo botón para escaneo rápido
 
     public LoginView() {
         // Cambiar el look and feel a FlatLaf
@@ -19,13 +20,13 @@ public class LoginView extends JFrame {
         }
 
         setTitle("CheckAsist - Login");
-        setSize(350, 250);
+        setSize(350, 300); // Ajusté el tamaño para más espacio
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // Panel con fondo y bordes redondeados
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2, 10, 10));
+        panel.setLayout(new GridLayout(4, 2, 10, 10)); // Cambié el layout para agregar el botón
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // Etiquetas y campos de texto con estilo FlatLaf
@@ -51,9 +52,16 @@ public class LoginView extends JFrame {
         btnLogin.setFocusPainted(false);
         panel.add(btnLogin);
 
+        // Botón para escaneo rápido
+        btnEscaneoRapido = new JButton("Escaneo Rápido");
+        btnEscaneoRapido.setFont(new Font("Arial", Font.BOLD, 14));
+        btnEscaneoRapido.setFocusPainted(false);
+        panel.add(btnEscaneoRapido);
+
         add(panel);
     }
 
+    // Métodos para obtener datos del login
     public String getUsername() {
         return txtUsername.getText();
     }
@@ -62,15 +70,16 @@ public class LoginView extends JFrame {
         return new String(txtPassword.getPassword());
     }
 
+    // Agregar listeners
     public void addLoginListener(ActionListener listener) {
         btnLogin.addActionListener(listener);
     }
 
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    public void addEscaneoRapidoListener(ActionListener listener) {
+        btnEscaneoRapido.addActionListener(listener);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LoginView().setVisible(true));
+    public void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

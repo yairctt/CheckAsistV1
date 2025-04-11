@@ -68,10 +68,11 @@ public class GestionEmpleadosController {
             stmt.setString(4, view.getRol());
             stmt.executeUpdate();
 
-            // 🔽 Generar códigos QR y de barras
+            // 🔽 Generar códigos QR y de barras con username incluido
             String rutaCodigos = "C:/Users/yairc/Documents/CheckAsistV1/src/resources/codigos/";
-            String nombreArchivoQR = rutaCodigos + "QR_" + idEmpleado + ".png";
-            String nombreArchivoBarras = rutaCodigos + "BARRA_" + idEmpleado + ".png";
+            String username = view.getUsername(); // Obtener el username
+            String nombreArchivoQR = rutaCodigos + "QR_" + idEmpleado + "_" + username + ".png";
+            String nombreArchivoBarras = rutaCodigos + "BARRA_" + idEmpleado + "_" + username + ".png";
 
             try {
                 CodigoUtil.generarCodigoQR(qrCode, nombreArchivoQR);
